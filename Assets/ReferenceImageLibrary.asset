@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 848409ee8ba454f42a5ddff137688a27, type: 3}
+  m_Name: ReferenceImageLibrary
+  m_EditorClassIdentifier: 
+  m_GuidLow: 4910021890020848298
+  m_GuidHigh: 13336113894636758708
+  m_DataStore:
+    m_Storage: []
+  m_Images:
+  - m_SerializedGuid:
+      m_GuidLow: 5303792973748458880
+      m_GuidHigh: 5300834573462841268
+    m_SerializedTextureGuid:
+      m_GuidLow: 18038213788081746521
+      m_GuidHigh: 12822574127763538635
+    m_Size: {x: 0.5, y: 0.32625994}
+    m_SpecifySize: 1
+    m_Name: FishV2
+    m_Texture: {fileID: 0}
