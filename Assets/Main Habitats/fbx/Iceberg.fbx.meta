@@ -3,7 +3,22 @@ guid: 7cd75d48a66c4234ca9cdf9db9963602
 ModelImporter:
   serializedVersion: 22200
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Ground
+    second: {fileID: 2100000, guid: 8441a68d1c47c744899600855929ce0b, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Iceberg
+    second: {fileID: 2100000, guid: c2de0068a580c8a49b88965f89b04f77, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Water
+    second: {fileID: 2100000, guid: f9efd7fa2400c804bb0df760acc7f6da, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0
