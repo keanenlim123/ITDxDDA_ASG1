@@ -54,26 +54,33 @@ public class ImageTracker : MonoBehaviour
 
     void UpdateImage(ARTrackedImage trackedImage)
     {
-        if(trackedImage != null)
+        if (trackedImage != null)
         {
-            if (trackedImage.trackingState == TrackingState.Limited || trackedImage.trackingState == TrackingState.None)
+            string imageName = trackedImage.referenceImage.name;
+
+            if (trackedImage.trackingState == TrackingState.Limited ||
+                trackedImage.trackingState == TrackingState.None)
             {
-                //Disable the associated content
-                spawnedPrefabs[trackedImage.referenceImage.name].transform.SetParent(null);
-                spawnedPrefabs[trackedImage.referenceImage.name].SetActive(false);
+                spawnedPrefabs[imageName].transform.SetParent(null);
+                spawnedPrefabs[imageName].SetActive(false);
+                return;
             }
-            else if (trackedImage.trackingState == TrackingState.Tracking)
+
+            if (trackedImage.trackingState == TrackingState.Tracking)
             {
-                Debug.Log(trackedImage.gameObject.name + " is being tracked.");
-                //Enable the associated content
-                if(spawnedPrefabs[trackedImage.referenceImage.name].transform.parent != trackedImage.transform)
+                GameObject prefab = spawnedPrefabs[imageName];
+
+                // Attach prefab to tracked image
+                if (prefab.transform.parent != trackedImage.transform)
                 {
-                    Debug.Log("Enabling associated content: " + spawnedPrefabs[trackedImage.referenceImage.name].name);
-                    spawnedPrefabs[trackedImage.referenceImage.name].transform.SetParent(trackedImage.transform);
-                    spawnedPrefabs[trackedImage.referenceImage.name].transform.localPosition = Vector3.zero;
-                    spawnedPrefabs[trackedImage.referenceImage.name].transform.localRotation = Quaternion.identity;
-                    spawnedPrefabs[trackedImage.referenceImage.name].SetActive(true);
+                    prefab.transform.SetParent(trackedImage.transform);
+                    prefab.SetActive(true);
                 }
+
+                float distanceInFront = 0.1f;
+                prefab.transform.localPosition = trackedImage.transform.up * distanceInFront;
+
+                prefab.transform.localRotation = Quaternion.identity;
             }
         }
     }
