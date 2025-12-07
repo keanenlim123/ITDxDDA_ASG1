@@ -5,6 +5,10 @@ TagManager:
   serializedVersion: 3
   tags:
   - Fish
+  - Sponge
+  - Artic
+  - Ocean
+  - Mangroove
   layers:
   - Default
   - TransparentFX

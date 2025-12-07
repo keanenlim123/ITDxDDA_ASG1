@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 867188043672584238}
   m_Layer: 0
   m_Name: Sponge
-  m_TagString: Untagged
+  m_TagString: Sponge
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -95,6 +95,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 27188416d27058647a171cbc39d5adbc, type: 3}
       propertyPath: m_Name
       value: Sponge3
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 27188416d27058647a171cbc39d5adbc, type: 3}
+      propertyPath: m_TagString
+      value: Sponge
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

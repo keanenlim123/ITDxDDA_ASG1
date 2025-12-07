@@ -14,6 +14,10 @@ public class ImageTracker : MonoBehaviour
 
     private Dictionary<string, GameObject> spawnedPrefabs = new Dictionary<string, GameObject>();
 
+    [SerializeField] private GameObject arcticCanvas;
+    [SerializeField] private GameObject oceanCanvas;
+    [SerializeField] private GameObject mangroveCanvas;
+
     private void Start()
     {
         if (trackedImageManager != null)
@@ -81,7 +85,51 @@ public class ImageTracker : MonoBehaviour
                 prefab.transform.localPosition = trackedImage.transform.up * distanceInFront;
 
                 prefab.transform.localRotation = Quaternion.identity;
+
+                ShowCanvasBasedOnTag(prefab.tag);
             }
         }
     }
+
+    void HideAllCanvases()
+    {
+        arcticCanvas.SetActive(false);
+        oceanCanvas.SetActive(false);
+        mangroveCanvas.SetActive(false);
+    }
+
+    void ShowCanvasBasedOnTag(string prefabTag)
+    {
+        HideAllCanvases();
+
+        if (prefabTag == "Artic")
+            arcticCanvas.SetActive(true);
+        else if (prefabTag == "Ocean")
+            oceanCanvas.SetActive(true);
+        else if (prefabTag == "Mangroove")
+            mangroveCanvas.SetActive(true);
+    }
+
+    void Update()
+    {
+        // Loop through all spawned prefabs
+        foreach (var kvp in spawnedPrefabs)
+        {
+            GameObject prefab = kvp.Value;
+
+            // Only check active prefabs (currently being tracked)
+            if (prefab.activeInHierarchy)
+            {
+                // Show canvas based on prefab tag
+                ShowCanvasBasedOnTag(prefab.tag);
+
+                // Optional: break if you only want 1 canvas visible at a time
+                return;
+            }
+        }
+
+        // If no prefab is active, hide all canvases
+        HideAllCanvases();
+    }
+
 }
