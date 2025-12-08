@@ -9,6 +9,7 @@ TagManager:
   - Artic
   - Ocean
   - Mangroove
+  - Penguin
   layers:
   - Default
   - TransparentFX

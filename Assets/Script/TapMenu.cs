@@ -8,7 +8,6 @@ public class TapMenu : MonoBehaviour
     public Button cancelButton;
     public Button button1;
     public Button button2;
-    public Button button3;
 
     private GameObject selectedFish; // Currently selected fish
 
@@ -23,7 +22,6 @@ public class TapMenu : MonoBehaviour
         // Other buttons just print logs for now
         button1.onClick.AddListener(() => Debug.Log("Button1 clicked"));
         button2.onClick.AddListener(() => Debug.Log("Button2 clicked"));
-        button3.onClick.AddListener(() => Debug.Log("Button3 clicked"));
     }
 
     public void panel()

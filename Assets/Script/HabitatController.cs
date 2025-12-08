@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -7,6 +8,7 @@ public class HabitatController : MonoBehaviour
     public string habitatName;
     public int maxHealth = 100;
     public int currentHealth = 0;
+    public List<GameObject> fishes = new List<GameObject>();
 
     [Header("UI")]
     public Slider healthBar;
@@ -15,6 +17,8 @@ public class HabitatController : MonoBehaviour
     {
         healthBar.maxValue = maxHealth;
         healthBar.value = currentHealth;
+
+        healthBar.interactable = false;
     }
 
     public void CleanTrash()
@@ -22,9 +26,17 @@ public class HabitatController : MonoBehaviour
         currentHealth += 10;
         if (currentHealth > maxHealth)
             currentHealth = maxHealth;
+        else if (currentHealth == 100)
+        {
+            foreach (GameObject fish in fishes)
+            {
+                fish.SetActive(true);
+            }
+        }
 
         healthBar.value = currentHealth;
 
         Debug.Log(habitatName + " health increased! Now: " + currentHealth);
+
     }
 }
