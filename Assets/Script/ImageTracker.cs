@@ -18,6 +18,8 @@ public class ImageTracker : MonoBehaviour
     [SerializeField] private GameObject oceanCanvas;
     [SerializeField] private GameObject mangroveCanvas;
 
+    [SerializeField] private GameObject coralReefCanvas;
+
     private void Start()
     {
         if (trackedImageManager != null)
@@ -96,6 +98,7 @@ public class ImageTracker : MonoBehaviour
         arcticCanvas.SetActive(false);
         oceanCanvas.SetActive(false);
         mangroveCanvas.SetActive(false);
+        coralReefCanvas.SetActive(false);
     }
 
     void ShowCanvasBasedOnTag(string prefabTag)
@@ -108,6 +111,8 @@ public class ImageTracker : MonoBehaviour
             oceanCanvas.SetActive(true);
         else if (prefabTag == "Mangroove")
             mangroveCanvas.SetActive(true);
+        else if (prefabTag == "CoralReef")
+            coralReefCanvas.SetActive(true);
     }
 
     void Update()

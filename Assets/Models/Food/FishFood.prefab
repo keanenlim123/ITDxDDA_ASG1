@@ -100,7 +100,7 @@ GameObject:
   - component: {fileID: 6498271472882812800}
   m_Layer: 0
   m_Name: FishFood
-  m_TagString: Untagged
+  m_TagString: Feedbag
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -307,7 +307,7 @@ GameObject:
   - component: {fileID: 6378177583342757815}
   m_Layer: 0
   m_Name: FishFood
-  m_TagString: Untagged
+  m_TagString: Feedbag
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

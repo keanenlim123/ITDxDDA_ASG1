@@ -10,6 +10,8 @@ TagManager:
   - Ocean
   - Mangroove
   - Penguin
+  - Feedbag
+  - CoralReef
   layers:
   - Default
   - TransparentFX

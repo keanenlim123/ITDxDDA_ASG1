@@ -1,10 +1,10 @@
 using UnityEngine;
 
-public class TrashObject : MonoBehaviour
+public class TrashObjectBehaviour : MonoBehaviour
 {
     [Header("Floating Settings")]
-    [SerializeField] private float floatSpeed = 0.05f;     // Speed of up/down motion
-    [SerializeField] private float floatHeight = 0.15f; // Distance of movement
+    [SerializeField] private float floatSpeed = 0.05f;  
+    [SerializeField] private float floatHeight = 0.15f; 
 
     private Vector3 startPos;
     public HabitatController parentHabitat;

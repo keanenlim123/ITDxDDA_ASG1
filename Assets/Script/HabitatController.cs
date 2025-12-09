@@ -39,4 +39,40 @@ public class HabitatController : MonoBehaviour
         Debug.Log(habitatName + " health increased! Now: " + currentHealth);
 
     }
+    public void Feed()
+    {
+        currentHealth += 50;
+
+        if (currentHealth > maxHealth)
+            currentHealth = maxHealth;
+
+        // When habitat reaches full health, activate fishes
+        if (currentHealth == maxHealth)
+        {
+            foreach (GameObject fish in fishes)
+            {
+                fish.SetActive(true);
+            }
+        }
+
+        healthBar.value = currentHealth;
+
+        Debug.Log(habitatName + " fed! Health now: " + currentHealth);
+    }
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("Feedbag"))
+        {
+            // Only allow feeding if currentHealth is more than 50
+            if (currentHealth >= 50)
+            {
+                Feed();
+                Destroy(other.gameObject);
+            }
+            else
+            {
+                Debug.Log(habitatName + " health too low (< 50). Cannot feed yet.");
+            }
+        }
+    }
 }

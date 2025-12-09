@@ -49,6 +49,11 @@ public class TapMenu : MonoBehaviour
                         selectedFish = fishCollider.gameObject;
                         ShowMenu();
                     }
+                    else if (fishCollider.CompareTag("Penguin"))
+                    {
+                        selectedFish = fishCollider.gameObject;
+                        ShowMenu();
+                    }
                     else
                     {
                         // Check parent objects in case fish is nested

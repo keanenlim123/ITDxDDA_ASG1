@@ -47,3 +47,13 @@ MonoBehaviour:
     m_SpecifySize: 1
     m_Name: Ocean
     m_Texture: {fileID: 0}
+  - m_SerializedGuid:
+      m_GuidLow: 5319666368927792024
+      m_GuidHigh: 6460970057987116678
+    m_SerializedTextureGuid:
+      m_GuidLow: 2604351317123189532
+      m_GuidHigh: 12751497334704085496
+    m_Size: {x: 0.3535, y: 0.5}
+    m_SpecifySize: 1
+    m_Name: Coral_Reef
+    m_Texture: {fileID: 0}
