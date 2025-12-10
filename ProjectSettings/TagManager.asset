@@ -4,7 +4,6 @@
 TagManager:
   serializedVersion: 3
   tags:
-  - Fish
   - Sponge
   - Artic
   - Ocean
@@ -13,6 +12,10 @@ TagManager:
   - Feedbag
   - CoralReef
   - Polarbear
+  - Clownfish
+  - Mantaray
+  - Jellyfish
+  - Sunfish
   layers:
   - Default
   - TransparentFX
