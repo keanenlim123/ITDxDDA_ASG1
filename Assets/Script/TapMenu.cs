@@ -1,91 +1,84 @@
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class TapMenu : MonoBehaviour
 {
-    [Header("UI Elements")]
-    public GameObject menuPanel;
-    public Button cancelButton;
-    public Button button1;
-    public Button button2;
+    [Header("Panels")]
+    public GameObject optionsMenuPanel;
+    public GameObject animalInfoPanel;
 
-    private GameObject selectedFish; // Currently selected fish
+    [Header("Buttons")]
+    public Button optionsCancelButton;
+    public Button learnButton;
+    public Button animalInfoCancelButton;
+
+    [Header("Animal Info UI")]
+    public TMP_Text animalNameText;
+    public TMP_Text descriptionText;
+    public RawImage animalImage;
+
+    private AnimalBehaviour selectedAnimal;
 
     void Start()
     {
-        // Hide menu at start
-        menuPanel.SetActive(false);
+        optionsMenuPanel.SetActive(false);
+        animalInfoPanel.SetActive(false);
 
-        // Cancel button closes the menu
-        cancelButton.onClick.AddListener(CloseMenu);
-
-        // Other buttons just print logs for now
-        button1.onClick.AddListener(() => Debug.Log("Button1 clicked"));
-        button2.onClick.AddListener(() => Debug.Log("Button2 clicked"));
-    }
-
-    public void panel()
-    {
-        menuPanel.SetActive(true);
+        optionsCancelButton.onClick.AddListener(CloseAllUI);
+        animalInfoCancelButton.onClick.AddListener(CloseAllUI);
+        learnButton.onClick.AddListener(OpenAnimalInfo);
     }
 
     void Update()
     {
-        // Detect left click or touch
         if (Input.GetMouseButtonDown(0))
         {
+            Debug.Log("Screen clicked");
+
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             RaycastHit hit;
 
             if (Physics.Raycast(ray, out hit))
             {
-                // Check if hit object or any child has the tag "Fish"
-                var fishCollider = hit.collider;
-                if (fishCollider != null)
+                Debug.Log("Hit: " + hit.collider.name);
+
+                AnimalBehaviour info = hit.collider.GetComponentInParent<AnimalBehaviour>();
+
+                if (info != null)
                 {
-                    // If the clicked object is tagged "Fish"
-                    if (fishCollider.CompareTag("Fish"))
-                    {
-                        selectedFish = fishCollider.gameObject;
-                        ShowMenu();
-                    }
-                    else if (fishCollider.CompareTag("Penguin"))
-                    {
-                        selectedFish = fishCollider.gameObject;
-                        ShowMenu();
-                    }
-                    else
-                    {
-                        // Check parent objects in case fish is nested
-                        Transform parent = fishCollider.transform.parent;
-                        while (parent != null)
-                        {
-                            if (parent.CompareTag("Fish"))
-                            {
-                                selectedFish = parent.gameObject;
-                                ShowMenu();
-                                break;
-                            }
-                            parent = parent.parent;
-                        }
-                    }
+                    Debug.Log("Animal found: " + info.animalName);
+                    selectedAnimal = info;
+                    optionsMenuPanel.SetActive(true);
                 }
+                else
+                {
+                    Debug.Log("No AnimalBehaviour on hit object");
+                }
+            }
+            else
+            {
+                Debug.Log("Raycast hit nothing");
             }
         }
     }
 
-    void ShowMenu()
+    void OpenAnimalInfo()
     {
-        if (selectedFish != null)
-        {
-            Debug.Log("Fish clicked: " + selectedFish.name);
-            menuPanel.SetActive(true);
-        }
+        if (selectedAnimal == null) return;
+
+        animalNameText.text = selectedAnimal.animalName;
+        descriptionText.text = selectedAnimal.description;
+        animalImage.texture = selectedAnimal.animalImage;
+
+        optionsMenuPanel.SetActive(false);
+        animalInfoPanel.SetActive(true);
     }
 
-    void CloseMenu()
+    void CloseAllUI()
     {
-        menuPanel.SetActive(false);
-        selectedFish = null;
+        optionsMenuPanel.SetActive(false);
+        animalInfoPanel.SetActive(false);
+        selectedAnimal = null;
     }
 }

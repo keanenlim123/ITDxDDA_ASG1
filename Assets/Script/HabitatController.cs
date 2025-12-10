@@ -8,6 +8,7 @@ public class HabitatController : MonoBehaviour
     public string habitatName;
     public int maxHealth = 100;
     public int currentHealth = 0;
+    public int requiredHealth = 50;
     public List<GameObject> fishes = new List<GameObject>();
 
     [Header("UI")]
@@ -26,7 +27,7 @@ public class HabitatController : MonoBehaviour
         currentHealth += 10;
         if (currentHealth > maxHealth)
             currentHealth = maxHealth;
-        else if (currentHealth == 100)
+        else if (currentHealth == maxHealth)
         {
             foreach (GameObject fish in fishes)
             {
@@ -64,14 +65,14 @@ public class HabitatController : MonoBehaviour
         if (other.CompareTag("Feedbag"))
         {
             // Only allow feeding if currentHealth is more than 50
-            if (currentHealth >= 50)
+            if (currentHealth >= requiredHealth)
             {
                 Feed();
                 Destroy(other.gameObject);
             }
             else
             {
-                Debug.Log(habitatName + " health too low (< 50). Cannot feed yet.");
+                Debug.Log(habitatName + " health too low less than currentHealth. Cannot feed yet.");
             }
         }
     }
