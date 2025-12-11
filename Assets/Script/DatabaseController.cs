@@ -12,8 +12,10 @@ public class DatabaseController : MonoBehaviour
     public TMP_InputField EmailInput;
     public TMP_InputField PasswordInput;
 
-    [SerializeField] public GameObject SignUpCanvas; 
-    [SerializeField] public GameObject MainCanvas; 
+    public TMP_InputField UsernameInput;
+
+    [SerializeField] public GameObject SignUpCanvas;
+    [SerializeField] public GameObject MainCanvas;
 
     public void SignOut()
     {
@@ -22,18 +24,49 @@ public class DatabaseController : MonoBehaviour
 
     public void SignUp()
     {
-        var signupTask = FirebaseAuth.DefaultInstance.CreateUserWithEmailAndPasswordAsync(EmailInput.text, PasswordInput.text);
+        var signupTask = FirebaseAuth.DefaultInstance
+            .CreateUserWithEmailAndPasswordAsync(EmailInput.text, PasswordInput.text);
+
         signupTask.ContinueWithOnMainThread(task =>
         {
             if (task.IsFaulted || task.IsCanceled)
             {
-                Debug.Log("Can't sign up due to error!!!");
+                Debug.Log("Can't sign up due to error.");
                 return;
             }
 
             if (task.IsCompleted)
             {
-                Debug.Log($"User signed up successfully, id: {task.Result.User.UserId}");
+                FirebaseUser newUser = task.Result.User;
+                string uid = newUser.UserId;
+
+                Debug.Log($"User signed up successfully, id: {uid}");
+
+                // Create player dictionary
+                Dictionary<string, object> playerData = new Dictionary<string, object>();
+                playerData["username"] = UsernameInput.text;
+                playerData["email"] = EmailInput.text;
+                playerData["password"] = PasswordInput.text;
+
+                // Create habitats dictionary
+                Dictionary<string, object> habitats = new Dictionary<string, object>();
+                string[] habitatNames = { "Ocean", "Arctic", "Mangrove", "Rainforest" };
+
+                foreach (string name in habitatNames)
+                {
+                    Dictionary<string, object> stats = new Dictionary<string, object>();
+                    stats["timeTaken"] = 0f;
+                    stats["pointsEarned"] = 0;
+                    habitats[name] = stats;
+                }
+
+                playerData["habitats"] = habitats;
+
+                // Upload to Firebase under /players/uid/
+                DatabaseReference db = FirebaseDatabase.DefaultInstance.RootReference;
+                db.Child("players").Child(uid).SetValueAsync(playerData);
+
+                // Switch screens
                 SignUpCanvas.SetActive(false);
                 MainCanvas.SetActive(true);
             }
@@ -120,45 +153,13 @@ public class DatabaseController : MonoBehaviour
                 Debug.Log(json);
 
                 // Deserialize JSON data back to Player object
-                Student p = JsonUtility.FromJson<Student>(json);
-                Debug.Log($"Player loaded: {p.name}");
+                Player p = JsonUtility.FromJson<Player>(json);
+                Debug.Log($"Player loaded: {p.username}");
             }
         });
 
-        Debug.Log("Hehehehehehh");
+        Debug.Log("done");
 
-
-        /***
-         * BEFORE CRUD
-         *
-        Player justin = new Player("detach8", "Justin");
-        justin.items.Add(new Item("sword", 2));
-
-        Player steve = new Player("steviewonder", "Steve from Minecraft");
-        steve.items.Add(new Item("pickaxe", 1));
-
-        Player alex = new Player("alexinwonderland", "Alex from Minecraft");
-        alex.items.Add(new Item("shovel", 1));
-
-        string justinJson = JsonUtility.ToJson(justin, true);
-        string steveJson = JsonUtility.ToJson(steve);
-
-        Debug.Log(justinJson);
-        Debug.Log(steveJson);
-
-        db.Child("players").Child(justin.playerId).SetRawJsonValueAsync(justinJson);
-        db.Child("players").Child(steve.playerId).SetRawJsonValueAsync(steveJson);
-
-
-        var newReference = db.Child("players").Push();
-
-        Debug.Log($"The key is: {newReference.Key}");
-
-        alex.playerId = newReference.Key; // Store the new key
-        string alexJson = JsonUtility.ToJson(alex);
-
-        newReference.SetRawJsonValueAsync(alexJson);
-        */
     }
 
     // Update is called once per frame
