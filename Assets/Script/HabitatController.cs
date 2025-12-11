@@ -14,6 +14,9 @@ public class HabitatController : MonoBehaviour
     [Header("UI")]
     public Slider healthBar;
 
+    [Header("Audio")]
+    public AudioClip feedingSound;
+
     void Start()
     {
         healthBar.maxValue = maxHealth;
@@ -30,50 +33,61 @@ public class HabitatController : MonoBehaviour
         else if (currentHealth == maxHealth)
         {
             foreach (GameObject fish in fishes)
-            {
                 fish.SetActive(true);
-            }
         }
 
         healthBar.value = currentHealth;
 
         Debug.Log(habitatName + " health increased! Now: " + currentHealth);
-
     }
+
     public void Feed()
     {
+        PlayFeedSound(); // 🔊 Play feeding sound
+
         currentHealth += 50;
 
         if (currentHealth > maxHealth)
             currentHealth = maxHealth;
 
-        // When habitat reaches full health, activate fishes
         if (currentHealth == maxHealth)
         {
             foreach (GameObject fish in fishes)
-            {
                 fish.SetActive(true);
-            }
         }
 
         healthBar.value = currentHealth;
 
         Debug.Log(habitatName + " fed! Health now: " + currentHealth);
     }
+
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Feedbag"))
         {
-            // Only allow feeding if currentHealth is more than 50
             if (currentHealth >= requiredHealth)
             {
                 Feed();
-                Destroy(other.gameObject);
+
+                Destroy(other.gameObject, 0.3f);
             }
             else
             {
-                Debug.Log(habitatName + " health too low less than currentHealth. Cannot feed yet.");
+                Debug.Log(habitatName + " health too low. Cannot feed yet.");
             }
         }
     }
+
+    private void PlayFeedSound()
+    {
+        if (feedingSound != null)
+        {
+            AudioSource.PlayClipAtPoint(feedingSound, transform.position, 1f);
+        }
+        else
+        {
+            Debug.LogWarning("No feedingSound assigned!");
+        }
+    }
+
 }

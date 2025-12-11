@@ -16,6 +16,8 @@ TagManager:
   - Mantaray
   - Jellyfish
   - Sunfish
+  - Crocodile
+  - Frog
   layers:
   - Default
   - TransparentFX

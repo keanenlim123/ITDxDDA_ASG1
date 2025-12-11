@@ -3,8 +3,12 @@ using UnityEngine;
 public class TrashObjectBehaviour : MonoBehaviour
 {
     [Header("Floating Settings")]
-    [SerializeField] private float floatSpeed = 0.05f;  
-    [SerializeField] private float floatHeight = 0.15f; 
+    [SerializeField] private float floatSpeed = 0.05f;
+    [SerializeField] private float floatHeight = 0.15f;
+
+    [Header("Sound Effect")]
+    [SerializeField] private AudioClip cleanSFX;   // sound played when trash is cleaned
+    private AudioSource audioSource;
 
     private Vector3 startPos;
     public HabitatController parentHabitat;
@@ -12,6 +16,12 @@ public class TrashObjectBehaviour : MonoBehaviour
     private void Start()
     {
         startPos = transform.position;
+
+        audioSource = GetComponent<AudioSource>();
+        if (audioSource == null)
+        {
+            audioSource = gameObject.AddComponent<AudioSource>();
+        }
     }
 
     void Update()
@@ -29,7 +39,10 @@ public class TrashObjectBehaviour : MonoBehaviour
                 parentHabitat.CleanTrash();
             }
 
-            Destroy(gameObject);
+            audioSource.PlayOneShot(cleanSFX);
+
+
+            Destroy(gameObject, 0.1f);
             Destroy(other.gameObject);
         }
     }
