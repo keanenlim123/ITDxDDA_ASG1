@@ -9,6 +9,8 @@ public class AnimalBehaviour : MonoBehaviour
     [TextArea]
     public string description;
 
+    public string habitatName;
+
     public Texture animalImage;
 
     [Header("Quiz Data")]

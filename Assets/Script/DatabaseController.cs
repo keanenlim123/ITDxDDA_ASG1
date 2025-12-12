@@ -42,33 +42,60 @@ public class DatabaseController : MonoBehaviour
 
                 Debug.Log($"User signed up successfully, id: {uid}");
 
-                // Create player dictionary
+                // --- Create Player Base Data ---
                 Dictionary<string, object> playerData = new Dictionary<string, object>();
                 playerData["username"] = UsernameInput.text;
                 playerData["email"] = EmailInput.text;
                 playerData["password"] = PasswordInput.text;
 
-                // Create habitats dictionary
+                // --- Habitat and Animals Structure ---
                 Dictionary<string, object> habitats = new Dictionary<string, object>();
-                string[] habitatNames = { "Ocean", "Arctic", "Mangrove", "Rainforest" };
 
-                foreach (string name in habitatNames)
+                // Define each habitat and its animals
+                Dictionary<string, string[]> habitatAnimals = new Dictionary<string, string[]>()
                 {
-                    Dictionary<string, object> stats = new Dictionary<string, object>();
-                    stats["timeTaken"] = 0f;
-                    stats["pointsEarned"] = 0;
-                    habitats[name] = stats;
+                { "Ocean",      new string[] { "Jellyfish", "Sunfish" } },
+                { "Arctic",     new string[] { "Penguin", "Polar Bear" } },
+                { "Mangrovoe",   new string[] { "Crocodile", "Dugong" } },
+                { "Coral Reef", new string[] { "Clownfish", "Manta Ray" } }
+                };
+
+                foreach (var habitat in habitatAnimals)
+                {
+                    Dictionary<string, object> animalEntries = new Dictionary<string, object>();
+
+                    foreach (string animal in habitat.Value)
+                    {
+                        Dictionary<string, object> stats = new Dictionary<string, object>();
+                        stats["timeTaken"] = 0f;
+                        stats["pointsEarned"] = 0;
+
+                        animalEntries[animal] = stats;
+                    }
+
+                    habitats[habitat.Key] = animalEntries;
                 }
 
+                // Add to player data
                 playerData["habitats"] = habitats;
 
-                // Upload to Firebase under /players/uid/
+                // Upload to Firebase
                 DatabaseReference db = FirebaseDatabase.DefaultInstance.RootReference;
-                db.Child("players").Child(uid).SetValueAsync(playerData);
+                db.Child("players").Child(uid).SetValueAsync(playerData)
+                    .ContinueWithOnMainThread(uploadTask =>
+                    {
+                        if (uploadTask.IsCompleted)
+                        {
+                            Debug.Log("Player data uploaded successfully.");
 
-                // Switch screens
-                SignUpCanvas.SetActive(false);
-                MainCanvas.SetActive(true);
+                            SignUpCanvas.SetActive(false);
+                            MainCanvas.SetActive(true);
+                        }
+                        else
+                        {
+                            Debug.Log("Failed to upload player data.");
+                        }
+                    });
             }
         });
     }

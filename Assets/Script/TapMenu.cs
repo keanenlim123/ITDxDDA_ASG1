@@ -1,7 +1,11 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using System;
 using System.Collections.Generic;
+using Firebase.Database;
+using Firebase.Auth;
+using Firebase.Extensions;
 
 public class TapMenu : MonoBehaviour
 {
@@ -29,6 +33,14 @@ public class TapMenu : MonoBehaviour
     private AnimalBehaviour selectedAnimal;
     private int currentQuestionIndex = 0;
 
+    private bool quizAlreadyCompleted = false; // NEW
+
+    // NEW — Tracking quiz stats
+    private float quizStartTime;
+    private int pointsEarnedThisQuiz = 0;
+
+    private string currentHabitat = "Ocean"; // You can change this based on scene or object
+
     void Start()
     {
         optionsMenuPanel.SetActive(false);
@@ -42,7 +54,6 @@ public class TapMenu : MonoBehaviour
         learnButton.onClick.AddListener(OpenAnimalInfo);
         quizButton.onClick.AddListener(StartQuiz);
 
-        // Set answer button click listeners
         for (int i = 0; i < answerButtons.Length; i++)
         {
             int index = i;
@@ -65,10 +76,46 @@ public class TapMenu : MonoBehaviour
                 {
                     selectedAnimal = info;
                     currentQuestionIndex = 0;
+                    currentHabitat = info.habitatName;
+
+                    // Check Firebase before opening the menu
+                    CheckIfQuizCompleted(selectedAnimal.animalName, currentHabitat);
+
                     optionsMenuPanel.SetActive(true);
                 }
+
             }
         }
+    }
+
+    void CheckIfQuizCompleted(string animalName, string habitat)
+    {
+        FirebaseUser user = FirebaseAuth.DefaultInstance.CurrentUser;
+
+        if (user == null) return;
+
+        string uid = user.UserId;
+
+        DatabaseReference animalRef = FirebaseDatabase.DefaultInstance
+            .RootReference
+            .Child("players")
+            .Child(uid)
+            .Child("habitats")
+            .Child(habitat)
+            .Child(animalName);
+
+        animalRef.GetValueAsync().ContinueWithOnMainThread(task =>
+        {
+            if (!task.IsCompleted) return;
+
+            DataSnapshot s = task.Result;
+
+            quizAlreadyCompleted = s.Child("isCompleted").Exists &&
+                                   Convert.ToBoolean(s.Child("isCompleted").Value);
+
+            // Disable quiz button if completed
+            quizButton.interactable = !quizAlreadyCompleted;
+        });
     }
 
     void OpenAnimalInfo()
@@ -86,10 +133,19 @@ public class TapMenu : MonoBehaviour
     void StartQuiz()
     {
         if (selectedAnimal == null) return;
+        if (quizAlreadyCompleted)
+        {
+            Debug.Log("Quiz already completed. Cannot retake.");
+            return;
+        }
 
-        currentQuestionIndex = 0; // 🔥 IMPORTANT: Reset before starting ANY quiz
+        // RESET EVERYTHING
+        quizStartTime = 0f;
+        pointsEarnedThisQuiz = 0;
+        currentQuestionIndex = 0;
 
-        // Restore buttons in case previous quiz hid them
+        quizStartTime = Time.time;
+
         foreach (Button btn in answerButtons)
             btn.gameObject.SetActive(true);
 
@@ -100,16 +156,15 @@ public class TapMenu : MonoBehaviour
         LoadQuestion();
     }
 
+
     void LoadQuestion()
     {
-        // SAFETY CHECKS
         if (selectedAnimal == null) return;
         if (selectedAnimal.questions == null || selectedAnimal.questions.Count == 0) return;
         if (currentQuestionIndex >= selectedAnimal.questions.Count) return;
 
         questionText.text = selectedAnimal.questions[currentQuestionIndex];
 
-        // Get the answer list safely
         List<string> currentAnswers = selectedAnimal.answers[currentQuestionIndex].answers;
 
         for (int i = 0; i < answerButtons.Length; i++)
@@ -124,7 +179,11 @@ public class TapMenu : MonoBehaviour
 
         int correctIndex = selectedAnimal.correctAnswerIndexes[currentQuestionIndex];
 
-        // Move to next question
+        if (selectedIndex == correctIndex)
+        {
+            pointsEarnedThisQuiz += 10; // add 10 points
+        }
+
         currentQuestionIndex++;
 
         if (currentQuestionIndex >= selectedAnimal.questions.Count)
@@ -141,9 +200,12 @@ public class TapMenu : MonoBehaviour
     {
         questionText.text = "Quiz Complete!";
 
-        // Hide answer buttons
         foreach (Button btn in answerButtons)
             btn.gameObject.SetActive(false);
+
+        float quizDuration = Time.time - quizStartTime;
+
+        SaveQuizResultsToFirebase(quizDuration, pointsEarnedThisQuiz);
     }
 
     void CloseAllUI()
@@ -152,11 +214,58 @@ public class TapMenu : MonoBehaviour
         animalInfoPanel.SetActive(false);
         quizPanel.SetActive(false);
 
-        // Restore buttons for next quiz
         foreach (Button btn in answerButtons)
             btn.gameObject.SetActive(true);
 
         selectedAnimal = null;
-        currentQuestionIndex = 0; // 🔥 Prevent next animal from starting mid-quiz
+        currentQuestionIndex = 0;
+    }
+
+    void SaveQuizResultsToFirebase(float duration, int earnedPoints)
+    {
+        FirebaseUser user = FirebaseAuth.DefaultInstance.CurrentUser;
+
+        if (user == null)
+        {
+            Debug.LogError("Cannot save quiz results — no user logged in!");
+            return;
+        }
+
+        string uid = user.UserId;
+        string animalName = selectedAnimal.animalName;
+
+        DatabaseReference animalRef = FirebaseDatabase.DefaultInstance
+            .RootReference
+            .Child("players")
+            .Child(uid)
+            .Child("habitats")
+            .Child(currentHabitat)
+            .Child(animalName);
+
+        // Load existing data
+        animalRef.GetValueAsync().ContinueWithOnMainThread(task =>
+        {
+            if (!task.IsCompleted)
+            {
+                Debug.LogError("Failed to load animal stats");
+                return;
+            }
+
+            DataSnapshot s = task.Result;
+
+            double oldTime = s.Child("timeTaken").Exists ? Convert.ToDouble(s.Child("timeTaken").Value) : 0;
+            int oldPoints = s.Child("pointsEarned").Exists ? Convert.ToInt32(s.Child("pointsEarned").Value) : 0;
+
+            double newTime = oldTime + duration;
+            int newPoints = oldPoints + earnedPoints;
+
+            Dictionary<string, object> update = new Dictionary<string, object>();
+            update["timeTaken"] = newTime;
+            update["pointsEarned"] = newPoints;
+
+            animalRef.UpdateChildrenAsync(update);
+
+            Debug.Log($"Saved to Firebase: [{currentHabitat}] {animalName} +{duration} sec, +{earnedPoints} pts");
+        });
     }
 }
