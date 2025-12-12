@@ -4,7 +4,7 @@ using UnityEngine;
 /// Handles the behavior of a trash object in the scene, including floating motion,
 /// collision detection with a sponge, and playing a cleaning sound.
 /// </summary>
-public class TrashObjectBehaviour : MonoBehaviour
+public class AlgaeBehaviour : MonoBehaviour
 {
     [Header("Floating Settings")]
 
@@ -64,13 +64,13 @@ public class TrashObjectBehaviour : MonoBehaviour
     }
 
     /// <summary>
-    /// Handles collision with objects tagged as "Tong".
+    /// Handles collision with objects tagged as "Sponge".
     /// Cleans the trash, plays a sound, and destroys both objects.
     /// </summary>
     /// <param name="other">The collider that entered this object's trigger.</param>
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Tong"))
+        if (other.CompareTag("Sponge"))
         {
             // Notify parent habitat to clean
             if (parentHabitat != null)
