@@ -81,9 +81,9 @@ public class DatabaseController : MonoBehaviour
                 Dictionary<string, string[]> habitatAnimals = new Dictionary<string, string[]>()
                 {
                     { "Ocean",      new string[] { "Jellyfish", "Sunfish" } },
-                    { "Arctic",     new string[] { "Penguin", "Polar Bear" } },
-                    { "Mangrovoe",  new string[] { "Crocodile", "Dugong" } },
-                    { "Coral Reef", new string[] { "Clownfish", "Manta Ray" } }
+                    { "Arctic",     new string[] { "Penguin", "Polarbear" } },
+                    { "Mangroove",  new string[] { "Crocodile", "Frog" } },
+                    { "Coral Reef", new string[] { "Clownfish", "Mantaray" } }
                 };
 
                 foreach (var habitat in habitatAnimals)
