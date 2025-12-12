@@ -7,40 +7,108 @@ using Firebase.Database;
 using Firebase.Auth;
 using Firebase.Extensions;
 
+/// <summary>
+/// Handles the UI for interacting with animals, including learning information,
+/// taking quizzes, and saving quiz results to Firebase.
+/// </summary>
 public class TapMenu : MonoBehaviour
 {
     [Header("Panels")]
+
+    /// <summary>
+    /// Panel displaying options when an animal is tapped.
+    /// </summary>
     public GameObject optionsMenuPanel;
+
+    /// <summary>
+    /// Panel displaying animal information (name, description, image).
+    /// </summary>
     public GameObject animalInfoPanel;
+
+    /// <summary>
+    /// Panel displaying quiz questions and answers.
+    /// </summary>
     public GameObject quizPanel;
 
     [Header("Buttons")]
+
+    /// <summary>
+    /// Button to cancel the options menu.
+    /// </summary>
     public Button optionsCancelButton;
+
+    /// <summary>
+    /// Button to open the animal info panel.
+    /// </summary>
     public Button learnButton;
+
+    /// <summary>
+    /// Button to start the quiz.
+    /// </summary>
     public Button quizButton;
+
+    /// <summary>
+    /// Button to close the animal info panel.
+    /// </summary>
     public Button animalInfoCancelButton;
+
+    /// <summary>
+    /// Button to cancel the quiz panel.
+    /// </summary>
     public Button quizCancelButton;
 
     [Header("Animal Info UI")]
+
+    /// <summary>
+    /// Text field displaying the animal's name.
+    /// </summary>
     public TMP_Text animalNameText;
+
+    /// <summary>
+    /// Text field displaying the animal's description.
+    /// </summary>
     public TMP_Text descriptionText;
+
+    /// <summary>
+    /// Image displaying the animal.
+    /// </summary>
     public RawImage animalImage;
 
     [Header("Quiz UI")]
+
+    /// <summary>
+    /// Text field displaying the current quiz question.
+    /// </summary>
     public TMP_Text questionText;
+
+    /// <summary>
+    /// Array of buttons representing multiple-choice answers.
+    /// </summary>
     public Button[] answerButtons; // Size = 3
 
+    // Currently selected animal
     private AnimalBehaviour selectedAnimal;
+
+    // Index of the current quiz question
     private int currentQuestionIndex = 0;
 
-    private bool quizAlreadyCompleted = false; // NEW
+    /// <summary>
+    /// Tracks if the quiz has already been completed by the user.
+    /// </summary>
+    private bool quizAlreadyCompleted = false;
 
-    // NEW — Tracking quiz stats
+    // Tracking quiz stats
     private float quizStartTime;
     private int pointsEarnedThisQuiz = 0;
 
-    private string currentHabitat = "Ocean"; // You can change this based on scene or object
+    /// <summary>
+    /// Current habitat of the selected animal (used for saving quiz results).
+    /// </summary>
+    private string currentHabitat = "Ocean";
 
+    /// <summary>
+    /// Initializes UI and button listeners.
+    /// </summary>
     void Start()
     {
         optionsMenuPanel.SetActive(false);
@@ -61,6 +129,9 @@ public class TapMenu : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Detects clicks on animals in the scene and opens the options menu.
+    /// </summary>
     void Update()
     {
         if (Input.GetMouseButtonDown(0))
@@ -83,11 +154,15 @@ public class TapMenu : MonoBehaviour
 
                     optionsMenuPanel.SetActive(true);
                 }
-
             }
         }
     }
 
+    /// <summary>
+    /// Checks Firebase to see if the quiz for the selected animal has already been completed.
+    /// </summary>
+    /// <param name="animalName">Name of the animal.</param>
+    /// <param name="habitat">Name of the habitat.</param>
     void CheckIfQuizCompleted(string animalName, string habitat)
     {
         FirebaseUser user = FirebaseAuth.DefaultInstance.CurrentUser;
@@ -118,6 +193,9 @@ public class TapMenu : MonoBehaviour
         });
     }
 
+    /// <summary>
+    /// Opens the animal info panel and displays its data.
+    /// </summary>
     void OpenAnimalInfo()
     {
         if (selectedAnimal == null) return;
@@ -130,6 +208,9 @@ public class TapMenu : MonoBehaviour
         animalInfoPanel.SetActive(true);
     }
 
+    /// <summary>
+    /// Starts the quiz for the selected animal.
+    /// </summary>
     void StartQuiz()
     {
         if (selectedAnimal == null) return;
@@ -139,12 +220,10 @@ public class TapMenu : MonoBehaviour
             return;
         }
 
-        // RESET EVERYTHING
-        quizStartTime = 0f;
+        // Reset quiz stats
+        quizStartTime = Time.time;
         pointsEarnedThisQuiz = 0;
         currentQuestionIndex = 0;
-
-        quizStartTime = Time.time;
 
         foreach (Button btn in answerButtons)
             btn.gameObject.SetActive(true);
@@ -156,11 +235,12 @@ public class TapMenu : MonoBehaviour
         LoadQuestion();
     }
 
-
+    /// <summary>
+    /// Loads the current question and updates answer buttons.
+    /// </summary>
     void LoadQuestion()
     {
-        if (selectedAnimal == null) return;
-        if (selectedAnimal.questions == null || selectedAnimal.questions.Count == 0) return;
+        if (selectedAnimal == null || selectedAnimal.questions == null) return;
         if (currentQuestionIndex >= selectedAnimal.questions.Count) return;
 
         questionText.text = selectedAnimal.questions[currentQuestionIndex];
@@ -173,6 +253,10 @@ public class TapMenu : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Handles answer selection, awards points if correct, and advances to next question or ends quiz.
+    /// </summary>
+    /// <param name="selectedIndex">Index of the selected answer button.</param>
     void OnAnswerSelected(int selectedIndex)
     {
         if (selectedAnimal == null) return;
@@ -181,21 +265,20 @@ public class TapMenu : MonoBehaviour
 
         if (selectedIndex == correctIndex)
         {
-            pointsEarnedThisQuiz += 10; // add 10 points
+            pointsEarnedThisQuiz += 10;
         }
 
         currentQuestionIndex++;
 
         if (currentQuestionIndex >= selectedAnimal.questions.Count)
-        {
             EndQuiz();
-        }
         else
-        {
             LoadQuestion();
-        }
     }
 
+    /// <summary>
+    /// Ends the quiz, hides answer buttons, and saves results to Firebase.
+    /// </summary>
     void EndQuiz()
     {
         questionText.text = "Quiz Complete!";
@@ -208,6 +291,9 @@ public class TapMenu : MonoBehaviour
         SaveQuizResultsToFirebase(quizDuration, pointsEarnedThisQuiz);
     }
 
+    /// <summary>
+    /// Closes all UI panels and resets state.
+    /// </summary>
     void CloseAllUI()
     {
         optionsMenuPanel.SetActive(false);
@@ -221,6 +307,11 @@ public class TapMenu : MonoBehaviour
         currentQuestionIndex = 0;
     }
 
+    /// <summary>
+    /// Saves the quiz results (time and points) to Firebase under the player's animal stats.
+    /// </summary>
+    /// <param name="duration">Duration of the quiz in seconds.</param>
+    /// <param name="earnedPoints">Points earned during this quiz.</param>
     void SaveQuizResultsToFirebase(float duration, int earnedPoints)
     {
         FirebaseUser user = FirebaseAuth.DefaultInstance.CurrentUser;
@@ -242,7 +333,7 @@ public class TapMenu : MonoBehaviour
             .Child(currentHabitat)
             .Child(animalName);
 
-        // Load existing data
+        // Load existing data and update
         animalRef.GetValueAsync().ContinueWithOnMainThread(task =>
         {
             if (!task.IsCompleted)
@@ -259,9 +350,11 @@ public class TapMenu : MonoBehaviour
             double newTime = oldTime + duration;
             int newPoints = oldPoints + earnedPoints;
 
-            Dictionary<string, object> update = new Dictionary<string, object>();
-            update["timeTaken"] = newTime;
-            update["pointsEarned"] = newPoints;
+            Dictionary<string, object> update = new Dictionary<string, object>
+            {
+                ["timeTaken"] = newTime,
+                ["pointsEarned"] = newPoints
+            };
 
             animalRef.UpdateChildrenAsync(update);
 

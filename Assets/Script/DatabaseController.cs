@@ -4,24 +4,50 @@ using System.Collections.Generic;
 using Firebase.Extensions;
 using TMPro;
 using Firebase.Auth;
-using System;
 
+/// <summary>
+/// Handles Firebase authentication and database operations for players.
+/// Supports signing up, signing in, signing out, and uploading initial player data including habitats and animals.
+/// </summary>
 public class DatabaseController : MonoBehaviour
 {
-
+    /// <summary>
+    /// Input field for user email during sign up or sign in.
+    /// </summary>
     public TMP_InputField EmailInput;
+
+    /// <summary>
+    /// Input field for user password during sign up or sign in.
+    /// </summary>
     public TMP_InputField PasswordInput;
 
+    /// <summary>
+    /// Input field for username during sign up.
+    /// </summary>
     public TMP_InputField UsernameInput;
 
+    /// <summary>
+    /// UI Canvas displayed for sign up.
+    /// </summary>
     [SerializeField] public GameObject SignUpCanvas;
+
+    /// <summary>
+    /// Main UI Canvas displayed after successful login or sign up.
+    /// </summary>
     [SerializeField] public GameObject MainCanvas;
 
+    /// <summary>
+    /// Signs the current user out from Firebase authentication.
+    /// </summary>
     public void SignOut()
     {
         FirebaseAuth.DefaultInstance.SignOut();
     }
 
+    /// <summary>
+    /// Creates a new user with email and password, sets up the initial player data including habitats and animals,
+    /// and uploads it to Firebase Realtime Database.
+    /// </summary>
     public void SignUp()
     {
         var signupTask = FirebaseAuth.DefaultInstance
@@ -54,10 +80,10 @@ public class DatabaseController : MonoBehaviour
                 // Define each habitat and its animals
                 Dictionary<string, string[]> habitatAnimals = new Dictionary<string, string[]>()
                 {
-                { "Ocean",      new string[] { "Jellyfish", "Sunfish" } },
-                { "Arctic",     new string[] { "Penguin", "Polar Bear" } },
-                { "Mangrovoe",   new string[] { "Crocodile", "Dugong" } },
-                { "Coral Reef", new string[] { "Clownfish", "Manta Ray" } }
+                    { "Ocean",      new string[] { "Jellyfish", "Sunfish" } },
+                    { "Arctic",     new string[] { "Penguin", "Polar Bear" } },
+                    { "Mangrovoe",  new string[] { "Crocodile", "Dugong" } },
+                    { "Coral Reef", new string[] { "Clownfish", "Manta Ray" } }
                 };
 
                 foreach (var habitat in habitatAnimals)
@@ -100,6 +126,10 @@ public class DatabaseController : MonoBehaviour
         });
     }
 
+    /// <summary>
+    /// Signs in an existing user using email and password.
+    /// Logs the user id upon successful login.
+    /// </summary>
     public void SignIn()
     {
         var signInTask = FirebaseAuth.DefaultInstance.SignInWithEmailAndPasswordAsync(EmailInput.text, PasswordInput.text);
@@ -120,79 +150,4 @@ public class DatabaseController : MonoBehaviour
 
         Debug.Log("Hahahahaha");
     }
-
-    // Auth event handling example
-    private void OnAuthStateChanged(object sender, EventArgs e)
-    {
-        Debug.Log("Auth state changed!");
-
-        if (FirebaseAuth.DefaultInstance.CurrentUser == null)
-        {
-            Debug.Log("User is not logged in!");
-        }
-        else
-        {
-            Debug.Log($"User logged in: {FirebaseAuth.DefaultInstance.CurrentUser.UserId}");
-        }
-    }
-
-    void Start()
-    {
-        // Auth event handling example
-        FirebaseAuth.DefaultInstance.StateChanged += OnAuthStateChanged;
-
-
-        var db = FirebaseDatabase.DefaultInstance.RootReference;
-
-        // Change a single value using SetValueAsync
-        db.Child("student").Child("detach8").Child("score").SetValueAsync(9999);
-
-        // Update using UpdateChildrenAsync
-        // This is used to bulk update multiple values
-        Dictionary<string, object> data = new Dictionary<string, object>();
-        data["name"] = "Some awesome guy";
-        data["score"] = 1234;
-        db.Child("student").Child("detach8").UpdateChildrenAsync(data);
-
-        // Delete the player "detach8"
-        db.Child("student").Child("detach8").RemoveValueAsync();
-
-        // Retrieve
-        var retrieveTask = db.Child("student").Child("somenonexistentplayer").GetValueAsync();
-
-        retrieveTask.ContinueWithOnMainThread(task =>
-        {
-            if (task.IsFaulted || task.IsCanceled)
-            {
-                Debug.Log("Error loading player!");
-                return;
-            }
-
-            if (task.IsCompleted)
-            {
-                if (!task.Result.Exists)
-                {
-                    Debug.Log("Invalid player id!");
-                    return;
-                }
-
-                string json = task.Result.GetRawJsonValue();
-                Debug.Log(json);
-
-                // Deserialize JSON data back to Player object
-                Player p = JsonUtility.FromJson<Player>(json);
-                Debug.Log($"Player loaded: {p.username}");
-            }
-        });
-
-        Debug.Log("done");
-
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
 }
-
