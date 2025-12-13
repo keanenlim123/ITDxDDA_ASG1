@@ -5,6 +5,7 @@ using Firebase.Extensions;
 
 /// <summary>
 /// Represents the behaviour and data for an animal in the game.
+/// Handles loading animal data from Firebase and storing quiz information.
 /// </summary>
 public class AnimalBehaviour : MonoBehaviour
 {
@@ -16,7 +17,7 @@ public class AnimalBehaviour : MonoBehaviour
     public string animalName;
 
     /// <summary>
-    /// A description of the animal. Can be multiple lines.
+    /// A description of the animal. Can span multiple lines.
     /// </summary>
     [TextArea]
     public string description;
@@ -37,24 +38,33 @@ public class AnimalBehaviour : MonoBehaviour
     /// The list of quiz questions related to this animal.
     /// Should have the same size as <see cref="answers"/> and <see cref="correctAnswerIndexes"/>.
     /// </summary>
-    public List<string> questions;  // Size = 3
+    public List<string> questions;
 
     /// <summary>
     /// The list of possible answers for each question.
     /// Each <see cref="AnswerSet"/> should contain exactly 3 answers.
     /// </summary>
-    public List<AnswerSet> answers;  // Each array size = 3
+    public List<AnswerSet> answers;
 
     /// <summary>
     /// The index of the correct answer for each question.
-    /// Should match the number of questions, values are 0, 1, or 2.
+    /// Should match the number of questions. Values are 0, 1, or 2.
     /// </summary>
-    public List<int> correctAnswerIndexes;  // 0, 1, or 2
+    public List<int> correctAnswerIndexes;
+
+    /// <summary>
+    /// Unity's Start method. Called on the frame when a script is enabled.
+    /// Initiates loading of animal data from Firebase.
+    /// </summary>
     void Start()
     {
         LoadAnimalFromFirebase();
     }
 
+    /// <summary>
+    /// Loads the animal's data from Firebase Realtime Database.
+    /// Populates <see cref="animalName"/> and <see cref="description"/> fields.
+    /// </summary>
     void LoadAnimalFromFirebase()
     {
         DatabaseReference db = FirebaseDatabase.DefaultInstance.RootReference;
@@ -85,7 +95,6 @@ public class AnimalBehaviour : MonoBehaviour
           });
     }
 }
-
 
 /// <summary>
 /// Represents a set of possible answers for a quiz question.

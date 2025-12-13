@@ -29,12 +29,7 @@ public class DatabaseController : MonoBehaviour
     /// <summary>
     /// UI Canvas displayed for sign up.
     /// </summary>
-    [SerializeField] public GameObject SignUpCanvas;
 
-    /// <summary>
-    /// Main UI Canvas displayed after successful login or sign up.
-    /// </summary>
-    [SerializeField] public GameObject MainCanvas;
 
     /// <summary>
     /// Signs the current user out from Firebase authentication.
@@ -201,9 +196,6 @@ public class DatabaseController : MonoBehaviour
                         if (uploadTask.IsCompleted)
                         {
                             Debug.Log("Player data uploaded successfully.");
-
-                            SignUpCanvas.SetActive(false);
-                            MainCanvas.SetActive(true);
                         }
                         else
                         {

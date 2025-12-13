@@ -44,7 +44,7 @@ public class HabitatEntry
     public HabitatStats stats;
 
     /// <summary>
-    /// Constructor for a HabitatEntry.
+    /// Initializes a new instance of the <see cref="HabitatEntry"/> class.
     /// </summary>
     /// <param name="name">The name of the habitat.</param>
     /// <param name="stats">The statistics for the habitat.</param>
@@ -72,7 +72,7 @@ public class HabitatStats
     public int pointsEarned;
 
     /// <summary>
-    /// Constructor for HabitatStats.
+    /// Initializes a new instance of the <see cref="HabitatStats"/> class.
     /// </summary>
     /// <param name="time">Time spent in the habitat.</param>
     /// <param name="points">Points earned in the habitat.</param>
@@ -82,10 +82,19 @@ public class HabitatStats
         pointsEarned = points;
     }
 }
+
+/// <summary>
+/// Represents an animal's data, including its name and description.
+/// </summary>
 public class AnimalData
 {
+    /// <summary>
+    /// The name of the animal.
+    /// </summary>
     public string name;
+
+    /// <summary>
+    /// A brief description of the animal.
+    /// </summary>
     public string description;
 }
-
-
