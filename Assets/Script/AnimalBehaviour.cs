@@ -1,5 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
+using Firebase.Database;
+using Firebase.Extensions;
 
 /// <summary>
 /// Represents the behaviour and data for an animal in the game.
@@ -48,7 +50,42 @@ public class AnimalBehaviour : MonoBehaviour
     /// Should match the number of questions, values are 0, 1, or 2.
     /// </summary>
     public List<int> correctAnswerIndexes;  // 0, 1, or 2
+    void Start()
+    {
+        LoadAnimalFromFirebase();
+    }
+
+    void LoadAnimalFromFirebase()
+    {
+        DatabaseReference db = FirebaseDatabase.DefaultInstance.RootReference;
+
+        db.Child("animals")
+          .Child(habitatName)
+          .Child(animalName)
+          .GetValueAsync()
+          .ContinueWithOnMainThread(task =>
+          {
+              if (task.IsFaulted || task.IsCanceled)
+              {
+                  Debug.LogError($"Failed to load animal {animalName} in {habitatName}");
+                  return;
+              }
+
+              DataSnapshot snapshot = task.Result;
+              if (!snapshot.Exists)
+              {
+                  Debug.LogError($"Animal not found in Firebase: {animalName}");
+                  return;
+              }
+
+              animalName = snapshot.Child("name").Value.ToString();
+              description = snapshot.Child("description").Value.ToString();
+
+              Debug.Log($"Loaded animal from Firebase: {animalName}");
+          });
+    }
 }
+
 
 /// <summary>
 /// Represents a set of possible answers for a quiz question.

@@ -82,3 +82,10 @@ public class HabitatStats
         pointsEarned = points;
     }
 }
+public class AnimalData
+{
+    public string name;
+    public string description;
+}
+
+

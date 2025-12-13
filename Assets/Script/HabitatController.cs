@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+
 /// <summary>
 /// Controls the behaviour of a habitat, including health management, feeding, cleaning trash, 
 /// and activating associated fish objects. Also handles UI and audio feedback.
