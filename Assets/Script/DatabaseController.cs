@@ -4,6 +4,9 @@ using System.Collections.Generic;
 using Firebase.Extensions;
 using TMPro;
 using Firebase.Auth;
+using Firebase;
+using UnityEngine.SceneManagement;
+
 
 /// <summary>
 /// Handles Firebase authentication and database operations for players.
@@ -25,11 +28,6 @@ public class DatabaseController : MonoBehaviour
     /// Input field for username during sign up.
     /// </summary>
     public TMP_InputField UsernameInput;
-
-    /// <summary>
-    /// UI Canvas displayed for sign up.
-    /// </summary>
-
 
     /// <summary>
     /// Signs the current user out from Firebase authentication.
@@ -196,6 +194,7 @@ public class DatabaseController : MonoBehaviour
                         if (uploadTask.IsCompleted)
                         {
                             Debug.Log("Player data uploaded successfully.");
+                            SceneManager.LoadScene("SampleScene");
                         }
                         else
                         {
@@ -223,6 +222,7 @@ public class DatabaseController : MonoBehaviour
             if (task.IsCompleted)
             {
                 Debug.Log($"User logged in, id: {task.Result.User.UserId}");
+                SceneManager.LoadScene("SampleScene");
 
                 // Code to load the user profile
             }

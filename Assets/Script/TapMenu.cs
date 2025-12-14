@@ -106,6 +106,7 @@ public class TapMenu : MonoBehaviour
     /// </summary>
     private string currentHabitat = "Ocean";
 
+
     /// <summary>
     /// Initializes UI and button listeners.
     /// </summary>

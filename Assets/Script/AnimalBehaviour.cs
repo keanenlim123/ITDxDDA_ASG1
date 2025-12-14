@@ -2,6 +2,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using Firebase.Database;
 using Firebase.Extensions;
+using Firebase;
 
 /// <summary>
 /// Represents the behaviour and data for an animal in the game.
@@ -56,9 +57,21 @@ public class AnimalBehaviour : MonoBehaviour
     /// Unity's Start method. Called on the frame when a script is enabled.
     /// Initiates loading of animal data from Firebase.
     /// </summary>
-    void Start()
+
+    void Awake()
     {
-        LoadAnimalFromFirebase();
+        FirebaseApp.CheckAndFixDependenciesAsync().ContinueWithOnMainThread(task =>
+        {
+            if (task.Result == DependencyStatus.Available)
+            {
+                Debug.Log("Firebase initialized successfully");
+                LoadAnimalFromFirebase(); // Move here
+            }
+            else
+            {
+                Debug.LogError("Firebase dependency error: " + task.Result);
+            }
+        });
     }
 
     /// <summary>

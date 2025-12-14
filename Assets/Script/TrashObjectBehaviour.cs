@@ -1,8 +1,9 @@
 using UnityEngine;
+using UnityEngine.XR.ARFoundation;
 
 /// <summary>
 /// Handles the behavior of a trash object in the scene, including floating motion,
-/// collision detection with a sponge, and playing a cleaning sound.
+/// collision detection with a tong, and playing a cleaning sound.
 /// </summary>
 public class TrashObjectBehaviour : MonoBehaviour
 {
@@ -11,7 +12,7 @@ public class TrashObjectBehaviour : MonoBehaviour
     /// <summary>
     /// Speed of the vertical floating motion.
     /// </summary>
-    [SerializeField] private float floatSpeed = 0.05f;
+    [SerializeField] private float floatSpeed = 1f;
 
     /// <summary>
     /// Maximum height the object floats above/below its starting position.
@@ -31,9 +32,9 @@ public class TrashObjectBehaviour : MonoBehaviour
     private AudioSource audioSource;
 
     /// <summary>
-    /// Starting position of the trash object, used for floating calculation.
+    /// Locked world position to prevent camera movement.
     /// </summary>
-    private Vector3 startPos;
+    private Vector3 lockedWorldPosition;
 
     /// <summary>
     /// Reference to the parent habitat this trash belongs to.
@@ -41,11 +42,19 @@ public class TrashObjectBehaviour : MonoBehaviour
     public HabitatController parentHabitat;
 
     /// <summary>
-    /// Initializes the trash object and ensures an AudioSource is attached.
+    /// Initializes the trash object, locks world position,
+    /// and ensures required components exist.
     /// </summary>
     private void Start()
     {
-        startPos = transform.position;
+        // Lock the world position ONCE
+        lockedWorldPosition = transform.position;
+
+        // Add AR Anchor for stability
+        if (GetComponent<ARAnchor>() == null)
+        {
+            gameObject.AddComponent<ARAnchor>();
+        }
 
         audioSource = GetComponent<AudioSource>();
         if (audioSource == null)
@@ -55,12 +64,17 @@ public class TrashObjectBehaviour : MonoBehaviour
     }
 
     /// <summary>
-    /// Updates the vertical position of the trash object to create a floating effect.
+    /// Applies floating motion after AR camera updates.
     /// </summary>
-    private void Update()
+    private void LateUpdate()
     {
-        float newY = startPos.y + Mathf.Sin(Time.time * floatSpeed) * floatHeight;
-        transform.position = new Vector3(transform.position.x, newY, transform.position.z);
+        float floatOffset = Mathf.Sin(Time.time * floatSpeed) * floatHeight;
+
+        transform.position = new Vector3(
+            lockedWorldPosition.x,
+            lockedWorldPosition.y + floatOffset,
+            lockedWorldPosition.z
+        );
     }
 
     /// <summary>
@@ -70,20 +84,20 @@ public class TrashObjectBehaviour : MonoBehaviour
     /// <param name="other">The collider that entered this object's trigger.</param>
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Tong"))
+        if (!other.CompareTag("Tong"))
+            return;
+
+        // Notify parent habitat
+        if (parentHabitat != null)
         {
-            // Notify parent habitat to clean
-            if (parentHabitat != null)
-            {
-                parentHabitat.CleanTrash();
-            }
-
-            // Play cleaning sound effect
-            audioSource.PlayOneShot(cleanSFX);
-
-            // Destroy this trash object and the sponge
-            Destroy(gameObject, 0.1f);
-            Destroy(other.gameObject);
+            parentHabitat.CleanTrash();
         }
+
+        // Play sound
+        audioSource.PlayOneShot(cleanSFX);
+
+        // Destroy objects
+        Destroy(gameObject, 0.1f);
+        Destroy(other.gameObject);
     }
 }
